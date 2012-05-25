@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -6,13 +5,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 
 public class accionBotones implements ActionListener {
@@ -22,17 +24,21 @@ public class accionBotones implements ActionListener {
 	 */
 	JButton boton[][];
 	JFrame fr;
-	JPanel centro;
-	JPanel sur;
+	JPanel centro, sur;
+	JLabel lblTiempo, txtTiempo, lblMinas, txtMinas, lblQuedan, txtQuedan;
 	GridLayout ly;
 	long minas[];
 	ActionListener cambioEstado;
+	Temporizador tiempo;
 	int partidas = 0;
 	int dimension;
+	int marcadas = 0;
+	Border pulsado;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		@SuppressWarnings("unused")
 		accionBotones accion = new accionBotones();
-
+		
 	}
 	/**
 	 * Constructor de la clase
@@ -43,6 +49,19 @@ public class accionBotones implements ActionListener {
 		fr = new JFrame();
 		centro = new JPanel();
 		sur = new JPanel();
+		/**
+		 * Etiquetas del panel sur: panel de estado
+		 */
+		lblTiempo = new JLabel("Tiempo transcurrido:");
+		txtTiempo = new JLabel();
+		lblMinas = new JLabel("Minas Marcadas:");
+		txtMinas = new JLabel();
+		lblQuedan = new JLabel("Minas Faltan:");
+		txtQuedan = new JLabel();
+		sur.add(lblTiempo);
+		sur.add(txtTiempo);
+		sur.add(lblMinas);
+		sur.add(txtMinas);
 		fr.add(centro, "Center");
 		fr.add(sur,"South");
 		menuOpciones();
@@ -55,6 +74,7 @@ public class accionBotones implements ActionListener {
 	 * Se inicia un nuevo Juego
 	 */
 	public void nuevoJuego() {
+		
 		int style = Font.BOLD;
 		Font font = new Font ("Arial", style , 16);
 		/**
@@ -68,7 +88,10 @@ public class accionBotones implements ActionListener {
 				}
 			}
 		}
-		centro.setVisible(false);
+		centro.setVisible( false );
+		sur.setVisible( false );
+		
+		txtMinas.setText(""+ marcadas+"");
 		boton = new JButton [dimension][dimension];
 		minas = new long[dimension];
 		ly = new GridLayout( dimension, dimension );
@@ -80,7 +103,6 @@ public class accionBotones implements ActionListener {
 				boton[i][j] = new JButton();
 				boton[i][j].setFont(font);
 				int action = i * dimension + j;
-				
 				boton[i][j].setActionCommand(""+action+"");
 				boton[i][j].addActionListener( accionesMinas );
 				boton[i][j].addMouseListener( botonPulsado );
@@ -89,9 +111,12 @@ public class accionBotones implements ActionListener {
 		}
 		System.out.println("Partida numero:" + partidas);
 		partidas++;
-		centro.setVisible(true);
-		
+		centro.setVisible( true );
+		sur.setVisible( true );
+//		tiempo = new Temporizador( this );
+//		tiempo.tiempo();
 	}
+	
 	/**
 	 * Menu del Juego
 	 */
@@ -260,18 +285,17 @@ public class accionBotones implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
+			pulsado = BorderFactory.createLoweredBevelBorder();
 			int number = Integer.parseInt( e.getActionCommand() );
 			int columna = number % dimension;
 			int fila = number / dimension;
 			ImageIcon imagenMina = createImageIcon("gnome-mines.png");
 			boton[fila][columna].setIcon(null);
-			Color background = new Color( 255, 255, 255);
-			boton[fila][columna].setBackground( background );
+			boton[fila][columna].setBorder( pulsado );
 			if ( cercana(fila, columna) > 0 ) {
 				boton[fila][columna].setText(""+cercana(fila,columna)+"");
 			} 
 			if ( hayMina(number) ) {
-				boton[fila][columna].setBackground( new Color( 255, 0, 0) );
 				boton[fila][columna].setText( null );
 				boton[fila][columna].setIcon( imagenMina );
 			}
@@ -297,9 +321,12 @@ public class accionBotones implements ActionListener {
 				JButton pulsado = (JButton) e.getComponent();
 				if (pulsado.getIcon() != null ) {
 					pulsado.setIcon(null);
+					marcadas--;
 				} else {
 					pulsado.setIcon( bandera );
+					marcadas++;
 				}
+				txtMinas.setText(""+marcadas+"");
 			}
 		}
 		
