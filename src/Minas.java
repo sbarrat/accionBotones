@@ -65,7 +65,7 @@ public class Minas {
 		int numCol = dimension - 1;
 		int numFil = dimension - 1;
 		// posicion izquierda arriba
-		System.out.println("Fila " + fila + ", Columna " + columna );
+//		System.out.println("Fila " + fila + ", Columna " + columna );
 		if ( fila > 0 && columna > 0 ) {
 			if ( hayMina( ( fila - 1 ) * dimension + ( columna - 1 ) ) ) {
 				cerca++;

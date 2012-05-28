@@ -1,15 +1,19 @@
+import javax.swing.JLabel;
+
 
 
 public class Temporizador extends Thread{
 
 	int segundos = 0;
-	Aplicacion ventana;
-	
-	public Temporizador( Aplicacion j ){
-	ventana = (Aplicacion) j;	
+	boolean salir = false;
+	JLabel txtTiempo;
+	public Temporizador( JLabel txt ){
+	txtTiempo = txt;
 	}
-	public void tiempo( ) {
-		while(segundos != 120 ) {
+	public void run() {
+		
+		while( !salir ) {
+			txtTiempo.setText(""+segundos);
 		try {
 			sleep(1000);
 		} catch (InterruptedException e) {
@@ -17,8 +21,12 @@ public class Temporizador extends Thread{
 			e.printStackTrace();
 		}
 		segundos++;
-		ventana.txtTiempo.setText(""+segundos+"");
-		System.out.println(segundos);
 		}
+		
 	}
+	public void parar (boolean para){
+		salir = ( para ) ? true : false;
+		
+	}
+	
 }

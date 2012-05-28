@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -21,6 +22,10 @@ import javax.swing.border.Border;
 import com.sun.xml.internal.ws.api.ha.StickyFeature;
 /**
  * Componentes Graficos de la aplicación
+ * TODO: Ventana de FIN DE JUEGO
+ * 		 Guardar record en fichero cuando acabe bien
+ * 
+ * 		
  *
  */
 public class Aplicacion {
@@ -34,6 +39,7 @@ public class Aplicacion {
 	Minas minas;
 	Font fuente;
 	Temporizador tiempo;
+	int minasMarcadas[];
 	int partidas = 0;
 	int dimension; // Establecemos por defecto la dimension
 	int marcadas = 0;
@@ -46,8 +52,11 @@ public class Aplicacion {
 		/**
 		 * Inicializamos la clase Minas
 		 */
+		dialogo = new JDialog();
+		fuente = new Font ("Arial", Font.BOLD , 16);
 		minas = new Minas();
 		dimension = 10;
+		minasMarcadas = new int[dimension];
 		minas.setDimension( dimension );
 		/**
 		 * Cargamos la ventana principal
@@ -149,6 +158,7 @@ public class Aplicacion {
 				}
 			}
 		}
+		
 		centro.setVisible( false );
 		sur.setVisible( false );
 		
@@ -172,19 +182,25 @@ public class Aplicacion {
 		partidas++;
 		centro.setVisible( true );
 		sur.setVisible( true );
-//		tiempo = new Temporizador( this );
-//		tiempo.tiempo();
-	}
+		
+		tiempo = new Temporizador( txtTiempo );
+		tiempo.start();
+		dialogo.setVisible(false);
+	}	
 	/**
 	 * Dialogo de Fin de Juego
 	 */
 	public void finJuego(){
-		JDialog dialogo = new JDialog();
+		
+		
+		tiempo.parar(true);
+		
+		int tiempoPartida = tiempo.segundos;
 		FlowLayout fl = new FlowLayout();
 		dialogo.setLayout(fl);
 		dialogo.setBounds(100, 100, 400, 100);
 		dialogo.setTitle("Fin de la Partida");
-		JLabel texto = new JLabel("¿La partida ha terminado, quieres jugar otra o salir?");
+		JLabel texto = new JLabel("¿La partida ha terminado en "+tiempoPartida+", quieres jugar otra o salir?");
 		dialogo.add(texto);
 		JButton botonRepetir = new JButton("Repetir");
 		botonRepetir.setActionCommand("nuevoJuego");
@@ -243,7 +259,8 @@ public class Aplicacion {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			fuente = new Font ("Arial", Font.BOLD , 16);
+			
+			
 			pulsado = BorderFactory.createLoweredBevelBorder();
 			int number = Integer.parseInt( e.getActionCommand() );
 			int columna = number % dimension;
@@ -255,6 +272,15 @@ public class Aplicacion {
 			 * Pulsamos una casilla cercana a una mina
 			 */
 			if ( minas.cercana(fila, columna) > 0 ) {
+				if ( minas.cercana(fila, columna) == 1 ) {
+					boton[fila][columna].setForeground(new Color(0,120,0) );
+				}
+				else if ( minas.cercana(fila, columna) == 2 ) {
+					boton[fila][columna].setForeground(new Color(0,0,120) );
+				} else {
+					boton[fila][columna].setForeground(new Color(120,0,0) );
+				}
+				
 				boton[fila][columna].setText(""+minas.cercana(fila,columna)+"");
 			} 
 			/**
@@ -283,7 +309,6 @@ public class Aplicacion {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			// TODO Auto-generated method stub
-			System.out.println( e.getButton() );
 			ImageIcon bandera = createImageIcon("red_flag.png");
 			// Boton derecho
 			if ( e.getButton() == 3 ) {
@@ -291,11 +316,20 @@ public class Aplicacion {
 				JButton pulsado = (JButton) e.getComponent();
 				if (pulsado.getIcon() != null ) {
 					pulsado.setIcon(null);
+					minasMarcadas[marcadas] = -1;
 					marcadas--;
 				} else {
-					pulsado.setIcon( bandera );
-					marcadas++;
+					if( marcadas < 10 ) {
+						minasMarcadas[marcadas] = Integer.parseInt( pulsado.getActionCommand() );
+						pulsado.setIcon( bandera );
+						marcadas++;
+					}
 				}
+				if( marcadas == 10 ) {
+					// TODO: Comprobar array de marcadas con array de minas
+					
+				}
+				System.out.println(pulsado.getActionCommand());
 				txtMinas.setText(""+marcadas+"");
 			}
 		}
