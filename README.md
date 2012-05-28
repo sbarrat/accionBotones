@@ -1,4 +1,4 @@
 accionBotones
 =============
 
-Juego del Buscaminas
+Programa del Busca Minas
