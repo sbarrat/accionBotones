@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -176,24 +177,25 @@ public class Aplicacion {
 		try {
 			Fichero puntuacion = new Fichero();
 			// Devuelve las puntuaciones
-			System.out.println(puntuacion.puntuaciones());
-			
+			DebugJuego(String.valueOf(puntuacion.puntuaciones()));
+			// Agrega el tiempo y el nombre del Ganador
+			// TODO: Pantalla de Ganador
 			puntuacion.agregar(tiempoPartida, "Ruben");
 			puntuacion.guardar();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// Si es la segunda partida se destruye el dialogo para crear uno nuevo
 		if ( partidas > 1 ) {
 			dialogo.dispose();
 		}
+		
 		dialogo = new JDialog();
 		FlowLayout fl = new FlowLayout();
 		dialogo.setLayout(fl);
 		dialogo.setBounds(100, 100, 400, 100);
 		dialogo.setTitle("Fin de la Partida");
-		JLabel texto = new JLabel("¿La partida ha terminado en "+tiempoPartida+", quieres jugar otra o salir?");
-		
+		JLabel texto = new JLabel("¿La partida ha terminado en "+formatoTiempo( tiempoPartida )+", quieres jugar otra o salir?");
 		dialogo.add(texto);
 		
 		JButton botonRepetir = new JButton("Repetir");
@@ -208,7 +210,12 @@ public class Aplicacion {
 		dialogo.setModal(true);
 		dialogo.setVisible(true);
 	}
-	
+	public String formatoTiempo( int tiempoPartida ) {
+		Date tiempo = new Date( tiempoPartida );
+		return tiempo.toString();
+		
+		
+	}
 	public static void DebugJuego(String texto) {
 		System.out.println( texto );
 	}
