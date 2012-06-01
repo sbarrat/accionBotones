@@ -7,14 +7,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
-
-
 /**
  * Clase encargada de la lectura y escritura del fichero de Puntuaciones
  *
  */
 public class Fichero {
-	private final String archivo = "puntuaciones.obj";
+	private final String archivo = "puntuaciones";
 	Hashtable<String,Puntuacion> tabla;
 	private String totalRegistros;
 	@SuppressWarnings("unchecked")

@@ -8,23 +8,33 @@ public class Minas {
 	public Minas(){
 		
 	}
-	
+	/**
+	 * Establecemos la dimension del numero de minas
+	 * @param nuevaDimension
+	 */
 	public void setDimension( int nuevaDimension  ) {
 		dimension = nuevaDimension;
 		minas = new long[dimension];
 	}
-	
+	/**
+	 * Obtenemos la dimension
+	 * @return
+	 */
 	private int getDimension() {
 		return dimension;
 	}
+	/**
+	 * Colocamos las minas
+	 */
 	public void colocaMinas() {
-		boolean colocada = false;
-		long mina = 0;
+		colocada = false;
+		mina = 0;
 		// Colocamos la primera mina
-		minas[0] = Math.round( Math.random()*getDimension()*getDimension() );
+		minas[0] = generaAleatorio();
+		// Colocamos el resto de minas
 		for (int i = 1; i < getDimension(); i++) {
 			while( !colocada ) {
-				mina = Math.round( Math.random()*getDimension()*getDimension() );
+				mina = generaAleatorio();
 				for (int j = 0; j < getDimension(); j++) {
 					if( minas[j] == mina) {
 						colocada = false;
@@ -39,6 +49,9 @@ public class Minas {
 		for (int i = 0; i < minas.length; i++) {
 			Aplicacion.DebugJuego(String.valueOf(minas[i]));
 		}
+	}
+	public long generaAleatorio() {
+		return Math.round( Math.random() * getDimension() * getDimension() );
 	}
 	/**
 	 * Detecta si hay una mina en esa posicion;
