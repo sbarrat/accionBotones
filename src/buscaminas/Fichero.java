@@ -84,5 +84,17 @@ public class Fichero {
 		objetoSalida.writeObject(tabla);
 		objetoSalida.close();
 	}
+	/**
+	 * Devuelve la puntuacion seleccionada
+	 * @param numero
+	 * @return
+	 */
+	public Puntuacion verRecord( String numero ){
+		if( tabla.containsKey( numero) )  {
+			return tabla.get( numero );
+		} else {
+			return null;
+		}
+	}
 
 }

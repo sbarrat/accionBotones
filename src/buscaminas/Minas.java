@@ -54,6 +54,24 @@ public class Minas {
 		return Math.round( Math.random() * getDimension() * getDimension() );
 	}
 	/**
+	 * Detecta si he marcado con bandera todas las minas
+	 * @param posiciones
+	 * @return
+	 */
+	public boolean minasDetectadas(int[] posiciones) {
+		int detectada = 0;
+		for (int i = 0; i < posiciones.length; i++) {
+			if( hayMina(posiciones[i]) ) {
+				detectada++;
+			}
+		}
+		if ( detectada == dimension ){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	/**
 	 * Detecta si hay una mina en esa posicion;
 	 * @param posicion
 	 * @return

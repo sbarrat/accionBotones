@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -20,6 +21,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 /**
@@ -27,6 +29,7 @@ import javax.swing.border.Border;
  * TODO:Ventana de FIN DE JUEGO cuando se gane
  * TODO:Mostrar los datos del fichero en puntuaciones
  * FIXME:Arreglar los datos en los bordes
+ * 
  * 
  * 		
  *
@@ -43,8 +46,11 @@ public class Aplicacion {
 	Minas minas;
 	Font fuente;
 	Temporizador tiempo;
+	Fichero puntuacion;
+	boolean ganado = false;
 	int tiempoPartida = 0;
 	int minasMarcadas[];
+	JTextField[] txtDialogo;
 	int partidas = 0;
 	int dimension; // Establecemos por defecto la dimension
 	int marcadas = 0;
@@ -56,6 +62,15 @@ public class Aplicacion {
 	public Aplicacion() {
 		dialogo = new JDialog();
 		minas = new Minas();
+		try {
+			puntuacion = new Fichero();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		dimension = 10;
 		minasMarcadas = new int[dimension];
 		minas.setDimension( dimension );
@@ -126,6 +141,8 @@ public class Aplicacion {
 	 * Iniciamos un nuevo Juego
 	 */
 	public void nuevoJuego() {
+		//inicializamos el numero de minas marcadas a 0
+		marcadas = 0;
 		// Si no es la primera partida elimina los botones puestos
 		if ( partidas >= 1 ) {
 			for (int i = 0; i < dimension; i++) {
@@ -133,12 +150,13 @@ public class Aplicacion {
 					centro.remove(boton[i][j]);
 				}
 			}
+			tiempo.parar(true);
 		}
 		// Ocultamos el panel central y la barra de estado
 		centro.setVisible( false );
 		sur.setVisible( false );
 		// Inicializamos la etiqueta de Minas Marcadas
-		txtMinas.setText(""+ marcadas+"");
+		txtMinas.setText( String.valueOf( marcadas ) );
 		// Creamos el array de botones
 		boton = new JButton [dimension][dimension];
 		// Creamos la capa que almacenara los botones
@@ -170,56 +188,94 @@ public class Aplicacion {
 		
 	}
 	/**
-	 * Dialogo de Fin de Juego
-	 * @throws ClassNotFoundException 
+	 * Guardamos la puntuacion en el fichero
 	 */
-	public void finJuego() throws ClassNotFoundException{
-		// Paramos el tiempo
-		tiempo.parar(true);
-		// Almacenamos el tiempo de partida
-		tiempoPartida = tiempo.segundos;
-		try {
-			Fichero puntuacion = new Fichero();
+	public void guardarPuntuacion(){
+		if ( ganado ) {
+			try {
+			
 			// Devuelve las puntuaciones
 			DebugJuego( String.valueOf( puntuacion.puntuaciones() ) );
 			// Agrega el tiempo y el nombre del Ganador
 			// TODO: Pantalla de Ganador
-			puntuacion.agregar( tiempoPartida, "Ruben" );
+			puntuacion.agregar( tiempoPartida, txtDialogo[0].getText() );
 			puntuacion.guardar();
-		} catch (IOException e) {
-			e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			ganado = false;
 		}
+	}
+	/**
+	 * Dialogo de Fin de Juego
+	 * @throws ClassNotFoundException 
+	 */
+	public void finJuego( boolean ganado ) throws ClassNotFoundException{
+		// Paramos el tiempo
+		tiempo.parar(true);
+		// Almacenamos el tiempo de partida
+		tiempoPartida = tiempo.segundos;
+		
 		// Si es la segunda partida se destruye el dialogo para crear uno nuevo
-		finPartida();
+		finPartida( ganado );
 	}
 	/**
 	 * Muestra el cuadro de dialogo de fin de Juego
 	 */
-	public void finPartida() {
+	public void finPartida( boolean ganado) {
 		// Especificamos el numero de etiquetas a usar
-		JLabel[] lblDialogo = new JLabel[1];
+		
 		// Especificamos el numero de botones a usar
-		JButton[] btnDialogo = new JButton[2]; 
-		
-		lblDialogo[0] = new JLabel("¿La partida ha terminado en " + 
-				formatoTiempo( tiempoPartida )+", quieres jugar otra o salir?");
-		
+		JButton[] btnDialogo = new JButton[2];
+		JTextField[] txtDialogo = new JTextField[1];
 		btnDialogo[0] = creaBoton( "Repetir", "nuevoJuego", accionesJuego );
 		btnDialogo[1] = creaBoton( "Salir", "salirJuego", accionesJuego );
+		if ( ganado ) {
+			// Especificamos el numero de etiquetas a usar
+			JLabel[] lblDialogo = new JLabel[2];
+			// Especificamos el numero de botones a usar	
+			lblDialogo[0] = new JLabel("Has ganado en " + 
+				formatoTiempo( tiempoPartida )+", quieres jugar otra o salir?");
+			lblDialogo[1] = new JLabel("Introduce tu nombre:");
+			txtDialogo[0] = new JTextField();
+			txtDialogo[0].setSize(100, 20);
+			dialogo = creaDialogo("Fin de la Partida", 500, 100, lblDialogo, btnDialogo, txtDialogo);
+		} else {
+			JLabel[] lblDialogo = new JLabel[1];
+			lblDialogo[0] = new JLabel("Has perdido quieres jugar otra o salir?");
+			dialogo = creaDialogo("Fin de la Partida", 500, 100, lblDialogo, btnDialogo);
+		}
 		
-		dialogo = creaDialogo("Fin de la Partida", 500, 100, lblDialogo, btnDialogo);
+		
+		
 	}
+	
+	
 	/**
 	 * Muestra el cuadro de dialogo de las puntuaciones del juego
 	 */
 	public void puntuacionesJuego() {
 		// Especificamos el numero de etiquetas a usar
-		JLabel[] lblDialogo = new JLabel[1];
+		JLabel[] lblDialogo = new JLabel[10];
+		int i = 1;
 		// Especificamos el numero de botones a usar
 		JButton[] btnDialogo = new JButton[1];
 		lblDialogo[0] = new JLabel( "Puntuaciones del Juego" );
+		Enumeration records = puntuacion.puntuaciones();
+		
+		while(records.hasMoreElements()){
+			String puntos = (String) records.nextElement();
+			Puntuacion datosRecord = puntuacion.verRecord(puntos);
+			if ( i <= 10) {
+				lblDialogo[i] = new JLabel( formatoTiempo(datosRecord.getTiempo()) + " - " + datosRecord.getNombre());
+				i++;
+			}
+		}
+		for (int j = i; j < 10; j++) {
+			lblDialogo[j] = new JLabel("00:00:00 -" + " --------");
+		}
 		btnDialogo[0] = creaBoton( "Cerrar Ventana", "cierraDialogo", accionesJuego );
-		dialogo = creaDialogo("Puntuaciones Juego", 500, 400, lblDialogo, btnDialogo);
+		dialogo = creaDialogo("Puntuaciones Juego", 170, 400, lblDialogo, btnDialogo);
 	}
 	/**
 	 * Cuadro de Dialogo de Acerca del Juego
@@ -266,6 +322,36 @@ public class Aplicacion {
 		dialogo.setTitle(title);
 		for (int i = 0; i < lblDialogo.length; i++) {
 			dialogo.add(lblDialogo[i]);
+		}
+		for (int i = 0; i < btnDialogo.length; i++) {
+			dialogo.add(btnDialogo[i]);
+		}
+		dialogo.setModal(true);
+		dialogo.setVisible(true);
+		return dialogo;
+	}
+	/**
+	 * Sobrecarga del objeto creaDialogo
+	 * @param string
+	 * @param i
+	 * @param j
+	 * @param lblDialogo
+	 * @param btnDialogo
+	 * @param txtDialogo
+	 * @return
+	 */
+	private JDialog creaDialogo(String title, int ancho, int alto,
+			JLabel[] lblDialogo, JButton[] btnDialogo, JTextField[] txtDialogo) {
+		dialogo = new JDialog();
+		FlowLayout fl = new FlowLayout();
+		dialogo.setLayout(fl);
+		dialogo.setBounds(100, 110, ancho, alto);
+		dialogo.setTitle(title);
+		for (int i = 0; i < lblDialogo.length; i++) {
+			dialogo.add(lblDialogo[i]);
+		}
+		for (int i = 0; i < txtDialogo.length; i++) {
+			dialogo.add(txtDialogo[i]);
 		}
 		for (int i = 0; i < btnDialogo.length; i++) {
 			dialogo.add(btnDialogo[i]);
@@ -334,10 +420,12 @@ public class Aplicacion {
 			// TODO Auto-generated method stub
 			dialogo.dispose();
 			if ( e.getActionCommand().equals( "salirJuego" ) ){
+				guardarPuntuacion();
 				frame.dispose();
 				System.exit(0);
 			}
 			if ( e.getActionCommand().equals( "nuevoJuego" ) ) {
+				guardarPuntuacion();
 				nuevoJuego();
 			}
 			if ( e.getActionCommand().equals( "puntuacionJuego" ) ) {
@@ -380,7 +468,7 @@ public class Aplicacion {
 				boton[fila][columna].setText( null );
 				boton[fila][columna].setIcon( imagenMina );
 				try {
-					finJuego();
+					finJuego( false );
 				} catch (ClassNotFoundException e1) {
 					e1.printStackTrace();
 				}
@@ -421,12 +509,14 @@ public class Aplicacion {
 			
 			ImageIcon bandera = createImageIcon( "red_flag.png" );
 			// Clic con el boton derecho en un boton
+			
 			if ( e.getButton() == 3 ) {
 				JButton pulsado = (JButton) e.getComponent();
 				if (pulsado.getIcon() != null ) {
 					pulsado.setIcon(null);
-					minasMarcadas[marcadas] = -1;
 					marcadas--;
+					minasMarcadas[marcadas] = -1;
+					
 				} else {
 					if( marcadas < 10 ) {
 						minasMarcadas[marcadas] = Integer.parseInt( pulsado.getActionCommand() );
@@ -434,9 +524,18 @@ public class Aplicacion {
 						marcadas++;
 					}
 				}
+				
 				if( marcadas == 10 ) {
 					// TODO: Comprobar array de marcadas con array de minas
-					
+					if (  minas.minasDetectadas(minasMarcadas) ) {
+						DebugJuego("fin");
+						try {
+							finJuego( true );
+						} catch (ClassNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
 				}
 				DebugJuego( pulsado.getActionCommand() );
 				txtMinas.setText( String.valueOf( marcadas ) );
