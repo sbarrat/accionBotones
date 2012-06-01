@@ -245,9 +245,6 @@ public class Aplicacion {
 			lblDialogo[0] = new JLabel("Has perdido quieres jugar otra o salir?");
 			dialogo = creaDialogo("Fin de la Partida", 500, 100, lblDialogo, btnDialogo);
 		}
-		
-		
-		
 	}
 	
 	
