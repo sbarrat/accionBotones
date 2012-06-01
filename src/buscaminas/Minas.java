@@ -3,7 +3,7 @@ public class Minas {
 
 	boolean colocada;
 	long mina;
-	long minas[];
+	private long minas[];
 	private int dimension = 10;
 	public Minas(){
 		
@@ -14,7 +14,7 @@ public class Minas {
 	 */
 	public void setDimension( int nuevaDimension  ) {
 		dimension = nuevaDimension;
-		minas = new long[dimension];
+		setMinas(new long[dimension]);
 	}
 	/**
 	 * Obtenemos la dimension
@@ -30,24 +30,24 @@ public class Minas {
 		colocada = false;
 		mina = 0;
 		// Colocamos la primera mina
-		minas[0] = generaAleatorio();
+		getMinas()[0] = generaAleatorio();
 		// Colocamos el resto de minas
 		for (int i = 1; i < getDimension(); i++) {
 			while( !colocada ) {
 				mina = generaAleatorio();
 				for (int j = 0; j < getDimension(); j++) {
-					if( minas[j] == mina) {
+					if( getMinas()[j] == mina) {
 						colocada = false;
 						break;
 					}
 					colocada = true;
 				}
 			}
-			minas[i] = mina;
+			getMinas()[i] = mina;
 			colocada = false;
 		}
-		for (int i = 0; i < minas.length; i++) {
-			Aplicacion.DebugJuego(String.valueOf(minas[i]));
+		for (int i = 0; i < getMinas().length; i++) {
+			Aplicacion.DebugJuego(String.valueOf(getMinas()[i]));
 		}
 	}
 	public long generaAleatorio() {
@@ -60,8 +60,8 @@ public class Minas {
 	 */
 	public boolean hayMina( int posicion ) {
 		boolean minaDetectada = false;
-		for (int i = 0; i < minas.length; i++) {
-			if ( minas[i] == posicion ) {
+		for (int i = 0; i < getMinas().length; i++) {
+			if ( getMinas()[i] == posicion ) {
 				minaDetectada = true;
 				break;
 			}
@@ -77,58 +77,75 @@ public class Minas {
 		int cerca = 0;
 		int numCol = dimension - 1;
 		int numFil = dimension - 1;
-		// posicion izquierda arriba
+		
 //		System.out.println("Fila " + fila + ", Columna " + columna );
+		Aplicacion.DebugJuego(fila+":"+columna +"-"+"Posicion:" + (fila*dimension+columna));
+		// posicion izquierda arriba
 		if ( fila > 0 && columna > 0 ) {
 			if ( hayMina( ( fila - 1 ) * dimension + ( columna - 1 ) ) ) {
 				cerca++;
+				Aplicacion.DebugJuego("cerca1:"+ (( fila - 1 ) * dimension + ( columna - 1 )));
 			}
 		}
 		// posicion arriba
 		if ( fila > 0 ) {
 			if ( hayMina( ( fila ) * dimension + ( columna - 1 ) ) ) {
 				cerca++;
+				Aplicacion.DebugJuego("cerca2:" + (( fila ) * dimension + ( columna - 1 )));
 			}
 		}
 		// posicion arriba derecha
 		if ( fila > 0 && columna < numCol ) {
 			if ( hayMina( ( fila + 1 ) * dimension + ( columna - 1 ) ) ) {
 				cerca++;
+				Aplicacion.DebugJuego("cerca3:" + (( fila + 1 ) * dimension + ( columna - 1 )));
 			}
 		}
 		// posicion centro izquierda
 		if ( columna > 0 ) {
 			if ( hayMina( ( fila - 1 ) * dimension + ( columna ) ) ) {
 				cerca++;
+				Aplicacion.DebugJuego("cerca4:" + (( fila - 1 ) * dimension + ( columna ) ));
 			}
+			
 		}
 		// posicion centro derecha
 		if ( columna < numCol ) {
 			if ( hayMina( ( fila + 1 ) * dimension + ( columna ) ) ) {
 				cerca++;
+				Aplicacion.DebugJuego("cerca5:" + (( fila + 1 ) * dimension + ( columna )));
 			}
 		}
 		// posicion izquierda abajo
 		if ( fila < numFil && columna > 0 ) {
 			if ( hayMina( ( fila - 1 ) * dimension + ( columna + 1 ) ) ) {
 				cerca++;
+				Aplicacion.DebugJuego("cerca6:" + (( fila - 1 ) * dimension + ( columna + 1 )));
 			}
 		}
 		// posicion abajo
 		if ( fila < numFil ) {
 			if ( hayMina( ( fila ) * dimension + ( columna + 1 ) ) ) {
 				cerca++;
+				Aplicacion.DebugJuego("cerca7:" + (( fila ) * dimension + ( columna + 1 )));
 			}
 		}
 		// posicion abajo derecha
 		if ( fila < numFil && columna < numCol ) {
 			if ( hayMina( ( fila + 1 ) * dimension + ( columna + 1 ) ) ) {
 				cerca++;
+				Aplicacion.DebugJuego("cerca8:" + (( fila + 1 ) * dimension + ( columna + 1 )));
 			}
 		}
 		
 		return cerca;
 		
+	}
+	long[] getMinas() {
+		return minas;
+	}
+	void setMinas(long minas[]) {
+		this.minas = minas;
 	}
 
 	

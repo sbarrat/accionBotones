@@ -384,18 +384,23 @@ public class Aplicacion {
 				} catch (ClassNotFoundException e1) {
 					e1.printStackTrace();
 				}
-			} else if ( minas.cercana(fila, columna) > 0 ) { // Mina Cercada
-				if ( minas.cercana(fila, columna) == 1 ) {
-					boton[fila][columna].setForeground( verde );
-				}
-				else if ( minas.cercana(fila, columna) == 2 ) {
-					boton[fila][columna].setForeground( azul );
-				} else {
-					boton[fila][columna].setForeground( rojo );
-				}
-				boton[fila][columna].setText( String.valueOf( minas.cercana(fila,columna) ) );
-				boton[fila][columna].setFont( fuente );
-			} 
+			} else {
+				int minaCercana = minas.cercana(fila, columna);
+				if ( minaCercana > 0 ) { // Mina Cercada
+					if ( minaCercana == 1 ) {
+						boton[fila][columna].setForeground( verde );
+					}
+					else if ( minaCercana == 2 ) {
+						boton[fila][columna].setForeground( azul );
+					} else {
+						boton[fila][columna].setForeground( rojo );
+					}
+					boton[fila][columna].setText( String.valueOf( minaCercana ) );
+					boton[fila][columna].setFont( fuente );
+				} 
+			}
+			
+			
 			
 		}
 	};
